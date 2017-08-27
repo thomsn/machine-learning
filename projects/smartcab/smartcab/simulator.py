@@ -55,13 +55,15 @@ class Simulator(object):
         self.display = display
         if self.display:
             try:
+                image_loc = os.path.join(os.path.dirname(__file__), '../images')
+
                 self.pygame = importlib.import_module('pygame')
                 self.pygame.init()
                 self.screen = self.pygame.display.set_mode(self.size)
-                self._logo = self.pygame.transform.smoothscale(self.pygame.image.load(os.path.join("images", "logo.png")), (self.road_width, self.road_width))
+                self._logo = self.pygame.transform.smoothscale(self.pygame.image.load(os.path.join(image_loc, "logo.png")), (self.road_width, self.road_width))
 
-                self._ew = self.pygame.transform.smoothscale(self.pygame.image.load(os.path.join("images", "east-west.png")), (self.road_width, self.road_width))
-                self._ns = self.pygame.transform.smoothscale(self.pygame.image.load(os.path.join("images", "north-south.png")), (self.road_width, self.road_width))
+                self._ew = self.pygame.transform.smoothscale(self.pygame.image.load(os.path.join(image_loc, "east-west.png")), (self.road_width, self.road_width))
+                self._ns = self.pygame.transform.smoothscale(self.pygame.image.load(os.path.join(image_loc, "north-south.png")), (self.road_width, self.road_width))
 
                 self.frame_delay = max(1, int(self.update_delay * 1000))  # delay between GUI frames in ms (min: 1)
                 self.agent_sprite_size = (32, 32)
@@ -69,9 +71,9 @@ class Simulator(object):
                 self.agent_circle_radius = 20  # radius of circle, when using simple representation
                 for agent in self.env.agent_states:
                     if agent.color == 'white':
-                        agent._sprite = self.pygame.transform.smoothscale(self.pygame.image.load(os.path.join("images", "car-{}.png".format(agent.color))), self.primary_agent_sprite_size)
+                        agent._sprite = self.pygame.transform.smoothscale(self.pygame.image.load(os.path.join(image_loc, "car-{}.png".format(agent.color))), self.primary_agent_sprite_size)
                     else:
-                        agent._sprite = self.pygame.transform.smoothscale(self.pygame.image.load(os.path.join("images", "car-{}.png".format(agent.color))), self.agent_sprite_size)
+                        agent._sprite = self.pygame.transform.smoothscale(self.pygame.image.load(os.path.join(image_loc, "car-{}.png".format(agent.color))), self.agent_sprite_size)
                     agent._sprite_size = (agent._sprite.get_width(), agent._sprite.get_height())
 
                 self.font = self.pygame.font.Font(None, 20)
@@ -90,18 +92,20 @@ class Simulator(object):
         if self.log_metrics:
             a = self.env.primary_agent
 
+            log_loc = os.path.join(os.path.dirname(__file__), '../logs')
+
             # Set log files
             if a.learning:
                 if self.optimized: # Whether the user is optimizing the parameters and decay functions
-                    self.log_filename = os.path.join("logs", "sim_improved-learning.csv")
-                    self.table_filename = os.path.join("logs","sim_improved-learning.txt")
+                    self.log_filename = os.path.join(log_loc, "sim_improved-learning.csv")
+                    self.table_filename = os.path.join(log_loc,"sim_improved-learning.txt")
                 else: 
-                    self.log_filename = os.path.join("logs", "sim_default-learning.csv")
-                    self.table_filename = os.path.join("logs","sim_default-learning.txt")
+                    self.log_filename = os.path.join(log_loc, "sim_default-learning.csv")
+                    self.table_filename = os.path.join(log_loc,"sim_default-learning.txt")
 
                 self.table_file = open(self.table_filename, 'wb')
             else:
-                self.log_filename = os.path.join("logs", "sim_no-learning.csv")
+                self.log_filename = os.path.join(log_loc, "sim_no-learning.csv")
             
             self.log_fields = ['trial', 'testing', 'parameters', 'initial_deadline', 'final_deadline', 'net_reward', 'actions', 'success']
             self.log_file = open(self.log_filename, 'wb')
